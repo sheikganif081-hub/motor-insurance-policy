@@ -1,0 +1,1154 @@
+create database MotorInsuranceDB;
+USE MotorInsuranceDB;
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerName VARCHAR(100),
+    gender ENUM('Male', 'Female', 'Other'),
+    Phone VARCHAR(15),
+    Email VARCHAR(100),
+    Address VARCHAR(200)
+    );
+    desc customer;
+    CREATE TABLE Vehicle (
+    VehicleID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    RegistrationNo VARCHAR(20) UNIQUE,
+    VehicleType VARCHAR(50),
+    Brand VARCHAR(50),
+    Model VARCHAR(50),
+    ManufacturingYear INT,
+    FOREIGN KEY (CustomerID) 
+    REFERENCES Customer(CustomerID)
+);
+desc vehicle;
+CREATE TABLE insurance_company (
+    company_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_name VARCHAR(100),
+    phone VARCHAR(15),
+    email VARCHAR(100)
+);
+desc insurance_company;
+
+CREATE TABLE MI_VEHICLE_MAKE (
+    MAKE_ID INT AUTO_INCREMENT PRIMARY KEY,
+    MAKE_DESC VARCHAR(100) NOT NULL,
+    STATUS VARCHAR(20) DEFAULT 'ACTIVE',
+    ADDED_ON DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADDED_BY VARCHAR(50)
+);
+desc MI_VEHICLE_MAKE;  
+-- VEHICLE MODEL
+CREATE TABLE MI_VEHICLE_MODEL (
+    MODEL_ID INT AUTO_INCREMENT PRIMARY KEY,
+    MODEL_DESC VARCHAR(100) NOT NULL,
+    MAKE_ID INT NOT NULL,
+    STATUS VARCHAR(20) DEFAULT 'ACTIVE',
+    ADDED_ON DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADDED_BY VARCHAR(50),
+    FOREIGN KEY (MAKE_ID)
+    REFERENCES MI_VEHICLE_MAKE(MAKE_ID)
+);
+
+ 
+-- REGION
+ 
+CREATE TABLE MI_REGION (
+    REGION_ID INT AUTO_INCREMENT PRIMARY KEY,
+    REGION_NAME VARCHAR(50)
+);
+
+ 
+-- STATE
+ 
+
+CREATE TABLE MI_STATE (
+    STATE_ID INT AUTO_INCREMENT PRIMARY KEY,
+    STATE_NAME VARCHAR(100),
+    REGION_ID INT,
+    FOREIGN KEY (REGION_ID)
+    REFERENCES MI_REGION(REGION_ID)
+);
+
+ 
+-- CITY
+ 
+
+CREATE TABLE MI_CITY (
+    CITY_ID INT AUTO_INCREMENT PRIMARY KEY,
+    CITY_NAME VARCHAR(100),
+    STATE_ID INT,
+    FOREIGN KEY (STATE_ID)
+    REFERENCES MI_STATE(STATE_ID)
+);
+
+ 
+-- VEHICLE COLOR
+ 
+
+CREATE TABLE MI_COLOR (
+    COLOR_ID INT AUTO_INCREMENT PRIMARY KEY,
+    COLOR_NAME VARCHAR(50)
+);
+
+ 
+-- VEHICLE BODY TYPE
+ 
+
+CREATE TABLE MI_BODY_TYPE (
+    BODY_ID INT AUTO_INCREMENT PRIMARY KEY,
+    BODY_NAME VARCHAR(100)
+);
+
+ 
+-- VEHICLE CATEGORY
+ 
+
+CREATE TABLE MI_CATEGORY (
+    CATEGORY_ID INT AUTO_INCREMENT PRIMARY KEY,
+    CATEGORY_NAME VARCHAR(50)
+);
+
+ 
+-- PRODUCT CONFIGURATION
+ 
+
+CREATE TABLE MI_PRODUCT_CONFIG (
+    PRODUCT_ID INT AUTO_INCREMENT PRIMARY KEY,
+    PRODUCT_NAME VARCHAR(100),
+    COVER_TYPE VARCHAR(50),
+    STATUS VARCHAR(20)
+);
+
+ 
+-- LOV TABLE
+ 
+
+CREATE TABLE MI_LOV (
+    LOV_ID INT AUTO_INCREMENT PRIMARY KEY,
+    LOV_TYPE VARCHAR(50),
+    LOV_VALUE VARCHAR(100),
+    STATUS VARCHAR(20)
+);
+
+ 
+-- PERSONAL INFORMATION
+ 
+
+CREATE TABLE MI_PERSON (
+    USER_ID INT AUTO_INCREMENT PRIMARY KEY,
+    USER_TYPE VARCHAR(30),
+    FIRST_NAME VARCHAR(50),
+    LAST_NAME VARCHAR(50),
+    GENDER VARCHAR(10),
+    DOB DATE,
+    EMAIL VARCHAR(100) NOT NULL,
+    MARITAL_STATUS INT,
+    EDUCATION INT,
+    PHONE VARCHAR(20),
+    MOBILE VARCHAR(20),
+    ADDR1 VARCHAR(100),
+    ADDR2 VARCHAR(100),
+    ADDR3 VARCHAR(100),
+    STREET VARCHAR(100),
+    CITY INT,
+    STATE INT,
+    COUNTRY INT,
+    NATIONAL_ID VARCHAR(30),
+    NATIONALITY INT,
+    STATUS VARCHAR(20),
+    ADDED_ON DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADDED_BY VARCHAR(50),
+
+    FOREIGN KEY (CITY)
+    REFERENCES MI_CITY(CITY_ID),
+
+    FOREIGN KEY (STATE)
+    REFERENCES MI_STATE(STATE_ID)
+);
+
+ 
+-- LOGIN TABLE
+ 
+
+CREATE TABLE MI_LOGIN (
+    LOGIN_ID INT AUTO_INCREMENT PRIMARY KEY,
+    PASSWORD VARCHAR(255) NOT NULL,
+    USER_ID INT,
+    LEAD_ID INT,
+    USER_TYPE VARCHAR(30),
+    STATUS VARCHAR(20),
+    ADDED_ON DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADDED_BY VARCHAR(50),
+
+    FOREIGN KEY (USER_ID)
+    REFERENCES MI_PERSON(USER_ID)
+);
+
+ 
+-- BROKER TABLE
+ 
+
+CREATE TABLE MI_BROKER (
+    BROKER_ID INT AUTO_INCREMENT PRIMARY KEY,
+    BROKER_NAME VARCHAR(100),
+    BROKER_ORG_NAME VARCHAR(150),
+    CONTACT_NO VARCHAR(20),
+    EMAIL VARCHAR(100),
+    ADDRESS VARCHAR(200),
+    STATUS VARCHAR(20),
+    ADDED_ON DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADDED_BY VARCHAR(50)
+);
+
+ 
+-- PREMIUM RATE
+ 
+
+CREATE TABLE MI_PREMIUM_RATE (
+    RATE_ID INT AUTO_INCREMENT PRIMARY KEY,
+    PRODUCT_ID INT,
+    COVER_TYPE VARCHAR(50),
+    BASE_PREMIUM DECIMAL(10,2),
+    TAX_PERCENT DECIMAL(5,2),
+    FOREIGN KEY (PRODUCT_ID)
+    REFERENCES MI_PRODUCT_CONFIG(PRODUCT_ID)
+);
+desc  MI_PREMIUM_RATE;
+ 
+-- BROKER COMMISSION
+ 
+
+CREATE TABLE MI_BROKER_COMMISSION (
+    COMMISSION_ID INT AUTO_INCREMENT PRIMARY KEY,
+    BROKER_ID INT,
+    PRODUCT_ID INT,
+    COMMISSION_PERCENT DECIMAL(5,2),
+
+    FOREIGN KEY (BROKER_ID)
+    REFERENCES MI_BROKER(BROKER_ID),
+
+    FOREIGN KEY (PRODUCT_ID)
+    REFERENCES MI_PRODUCT_CONFIG(PRODUCT_ID)
+);
+desc  MI_BROKER_COMMISSION;
+ 
+-- QUOTE TABLE
+ 
+
+CREATE TABLE MI_QUOTE (
+    QUOTE_ID INT AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT,
+    PRODUCT_ID INT,
+    COVER_TYPE VARCHAR(50),
+    PREMIUM DECIMAL(10,2),
+    TAX DECIMAL(10,2),
+    FINAL_PREMIUM DECIMAL(10,2),
+    QUOTE_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
+    STATUS VARCHAR(20),
+
+    FOREIGN KEY (USER_ID)
+    REFERENCES MI_PERSON(USER_ID),
+
+    FOREIGN KEY (PRODUCT_ID)
+    REFERENCES MI_PRODUCT_CONFIG(PRODUCT_ID)
+);
+desc MI_QUOTE;
+ 
+-- PREMIUM DETAILS
+ 
+
+CREATE TABLE MI_PREMIUM_DETAILS (
+    PREMIUM_ID INT AUTO_INCREMENT PRIMARY KEY,
+    QUOTE_ID INT,
+    PREMIUM_AMOUNT DECIMAL(10,2),
+    TAX_AMOUNT DECIMAL(10,2),
+    TOTAL_AMOUNT DECIMAL(10,2),
+
+    FOREIGN KEY (QUOTE_ID)
+    REFERENCES MI_QUOTE(QUOTE_ID)
+);
+USE MotorInsurance;
+desc  MI_PREMIUM_DETAILS ;
+           
+-- MI_VEHICLE_MAKE (15 Records)
+          
+
+INSERT INTO MI_VEHICLE_MAKE(MAKE_DESC,STATUS,ADDED_BY) VALUES
+('Toyota','ACTIVE','Admin'),
+('Honda','ACTIVE','Admin'),
+('Hyundai','ACTIVE','Admin'),
+('Ford','ACTIVE','Admin'),
+('BMW','ACTIVE','Admin'),
+('Audi','ACTIVE','Admin'),
+('Mercedes','ACTIVE','Admin'),
+('Kia','ACTIVE','Admin'),
+('Nissan','ACTIVE','Admin'),
+('Mahindra','ACTIVE','Admin'),
+('Tata','ACTIVE','Admin'),
+('Suzuki','ACTIVE','Admin'),
+('Renault','ACTIVE','Admin'),
+('Volkswagen','ACTIVE','Admin'),
+('Skoda','ACTIVE','Admin');
+
+           
+
+           
+
+INSERT INTO MI_VEHICLE_MODEL(MODEL_DESC,MAKE_ID,STATUS,ADDED_BY) VALUES
+('Corolla',1,'ACTIVE','Admin'),
+('Camry',1,'ACTIVE','Admin'),
+('Civic',2,'ACTIVE','Admin'),
+('City',2,'ACTIVE','Admin'),
+('Creta',3,'ACTIVE','Admin'),
+('Venue',3,'ACTIVE','Admin'),
+('Mustang',4,'ACTIVE','Admin'),
+('EcoSport',4,'ACTIVE','Admin'),
+('X5',5,'ACTIVE','Admin'),
+('A6',6,'ACTIVE','Admin'),
+('C-Class',7,'ACTIVE','Admin'),
+('Seltos',8,'ACTIVE','Admin'),
+('Magnite',9,'ACTIVE','Admin'),
+('Scorpio',10,'ACTIVE','Admin'),
+('Nexon',11,'ACTIVE','Admin');
+
+           
+-- MI_REGION (15 Records)
+           
+
+INSERT INTO MI_REGION(REGION_NAME) VALUES
+('North'),
+('South'),
+('East'),
+('West'),
+('Central'),
+('North East'),
+('North West'),
+('South East'),
+('South West'),
+('Coastal'),
+('Hill'),
+('Urban'),
+('Rural'),
+('Metro'),
+('International');
+
+
+
+INSERT INTO MI_STATE(STATE_NAME,REGION_ID) VALUES
+('Tamil Nadu',2),
+('Karnataka',2),
+('Kerala',2),
+('Andhra Pradesh',2),
+('Telangana',2),
+('Maharashtra',4),
+('Gujarat',4),
+('Delhi',1),
+('Punjab',1),
+('Rajasthan',1),
+('Odisha',3),
+('West Bengal',3),
+('Assam',6),
+('Bihar',3),
+('Uttar Pradesh',1);
+USE MotorInsurance;
+
+           
+-- MI_CITY (15 Records)
+           
+
+INSERT INTO MI_CITY (CITY_NAME, STATE_ID) VALUES
+('Chennai',1),
+('Coimbatore',1),
+('Bengaluru',2),
+('Mysuru',2),
+('Kochi',3),
+('Thiruvananthapuram',3),
+('Hyderabad',5),
+('Visakhapatnam',4),
+('Mumbai',6),
+('Pune',6),
+('Ahmedabad',7),
+('Jaipur',10),
+('Kolkata',12),
+('Lucknow',15),
+('Delhi',8);
+
+           
+-- MI_COLOR (15 Records)
+           
+
+INSERT INTO MI_COLOR (COLOR_NAME) VALUES
+('White'),
+('Black'),
+('Red'),
+('Blue'),
+('Silver'),
+('Grey'),
+('Green'),
+('Yellow'),
+('Orange'),
+('Brown'),
+('Gold'),
+('Purple'),
+('Maroon'),
+('Beige'),
+('Navy Blue');
+
+           
+-- MI_BODY_TYPE (15 Records)
+           
+
+INSERT INTO MI_BODY_TYPE (BODY_NAME) VALUES
+('Sedan'),
+('SUV'),
+('Hatchback'),
+('Coupe'),
+('Convertible'),
+('Pickup'),
+('Van'),
+('Bus'),
+('Truck'),
+('Mini Truck'),
+('Jeep'),
+('Wagon'),
+('Crossover'),
+('Motorcycle'),
+('Sports Car');
+
+           
+-- MI_CATEGORY (15 Records)
+           
+
+INSERT INTO MI_CATEGORY (CATEGORY_NAME) VALUES
+('Private'),
+('Commercial'),
+('Taxi'),
+('Motorcycle'),
+('Sports'),
+('Luxury'),
+('Electric'),
+('Hybrid'),
+('Government'),
+('Rental'),
+('School Bus'),
+('Goods Carrier'),
+('Passenger'),
+('Agricultural'),
+('Emergency');
+           
+-- MI_PRODUCT_CONFIG (15 Records)
+           
+
+INSERT INTO MI_PRODUCT_CONFIG
+(PRODUCT_NAME,COVER_TYPE,STATUS)
+VALUES
+('Basic Plan','Third Party','ACTIVE'),
+('Silver Plan','Comprehensive','ACTIVE'),
+('Gold Plan','Comprehensive','ACTIVE'),
+('Platinum Plan','Comprehensive','ACTIVE'),
+('Premium Bike','Bike','ACTIVE'),
+('Commercial Basic','Commercial','ACTIVE'),
+('Commercial Gold','Commercial','ACTIVE'),
+('Taxi Cover','Taxi','ACTIVE'),
+('Electric Protect','Electric','ACTIVE'),
+('Hybrid Shield','Hybrid','ACTIVE'),
+('Luxury Plus','Luxury','ACTIVE'),
+('Sports Cover','Sports','ACTIVE'),
+('Family Package','Comprehensive','ACTIVE'),
+('Business Fleet','Fleet','ACTIVE'),
+('Ultimate Plan','Comprehensive','ACTIVE');
+
+           
+-- MI_LOV (15 Records)
+           
+
+INSERT INTO MI_LOV
+(LOV_TYPE,LOV_VALUE,STATUS)
+VALUES
+('Gender','Male','ACTIVE'),
+('Gender','Female','ACTIVE'),
+('Gender','Other','ACTIVE'),
+('Marital','Single','ACTIVE'),
+('Marital','Married','ACTIVE'),
+('Education','Graduate','ACTIVE'),
+('Education','Post Graduate','ACTIVE'),
+('Education','Diploma','ACTIVE'),
+('Nationality','Indian','ACTIVE'),
+('Nationality','USA','ACTIVE'),
+('Nationality','UK','ACTIVE'),
+('Status','ACTIVE','ACTIVE'),
+('Status','INACTIVE','ACTIVE'),
+('Cover','TPL','ACTIVE'),
+('Cover','Comprehensive','ACTIVE');
+          
+-- PART 3 : TCL COMMANDS (MySQL)
+          
+
+USE MotorInsurance;
+
+           
+-- 1. COMMIT
+           
+
+INSERT INTO MI_COLOR (COLOR_NAME)
+VALUES ('Pearl White');
+
+COMMIT;
+
+           
+-- 2. ROLLBACK
+           
+
+INSERT INTO MI_COLOR (COLOR_NAME)
+VALUES ('Dark Green');
+
+ROLLBACK;
+
+           
+-- 3. SAVEPOINT
+           
+
+START TRANSACTION;
+
+INSERT INTO MI_CATEGORY (CATEGORY_NAME)
+VALUES ('VIP');
+
+SAVEPOINT SP1;
+
+INSERT INTO MI_CATEGORY (CATEGORY_NAME)
+VALUES ('Premium VIP');
+
+ROLLBACK TO SP1;
+
+COMMIT;
+
+           
+-- 4. TRANSACTION
+           
+
+START TRANSACTION;
+
+UPDATE MI_PRODUCT_CONFIG
+SET STATUS='INACTIVE'
+WHERE PRODUCT_ID=5;
+
+UPDATE MI_PREMIUM_RATE
+SET BASE_PREMIUM=3500
+WHERE RATE_ID=5;
+
+COMMIT;
+
+           
+-- 5. ROLLBACK TRANSACTION
+           
+
+START TRANSACTION;
+
+DELETE FROM MI_COLOR
+WHERE COLOR_ID=15;
+
+ROLLBACK;
+
+           
+-- 6. UPDATE WITH COMMIT
+           
+
+START TRANSACTION;
+
+UPDATE MI_BROKER
+SET CONTACT_NO='9876543210'
+WHERE BROKER_ID=1;
+
+COMMIT;
+
+           
+-- 7. DELETE WITH ROLLBACK
+           
+
+START TRANSACTION;
+
+DELETE FROM MI_LOGIN
+WHERE LOGIN_ID=10;
+
+ROLLBACK;
+
+           
+-- 8. MULTIPLE SAVEPOINTS
+           
+
+START TRANSACTION;
+
+INSERT INTO MI_BODY_TYPE (BODY_NAME)
+VALUES ('Mini SUV');
+
+SAVEPOINT S1;
+
+INSERT INTO MI_BODY_TYPE (BODY_NAME)
+VALUES ('Luxury SUV');
+
+SAVEPOINT S2;
+
+INSERT INTO MI_BODY_TYPE (BODY_NAME)
+VALUES ('Electric SUV');
+
+ROLLBACK TO S2;
+
+COMMIT;
+
+           
+-- 9. UPDATE USING SAVEPOINT
+           
+
+START TRANSACTION;
+
+UPDATE MI_PERSON
+SET STATUS='INACTIVE'
+WHERE USER_ID=3;
+
+SAVEPOINT USER_STATUS;
+
+UPDATE MI_PERSON
+SET STATUS='ACTIVE'
+WHERE USER_ID=4;
+
+ROLLBACK TO USER_STATUS;
+
+COMMIT;
+
+           
+-- 10. FINAL TRANSACTION
+           
+
+START TRANSACTION;
+
+INSERT INTO MI_QUOTE
+(USER_ID,PRODUCT_ID,COVER_TYPE,PREMIUM,TAX,FINAL_PREMIUM,STATUS)
+VALUES
+(1,1,'Comprehensive',10000,1800,11800,'APPROVED');
+
+COMMIT;
+USE MotorInsurance;
+
+          
+-- 1. INNER JOIN
+-- Display Vehicle Model with Vehicle Make
+          
+
+SELECT VM.MODEL_ID,
+       VM.MODEL_DESC,
+       MK.MAKE_DESC
+FROM MI_VEHICLE_MODEL VM
+INNER JOIN MI_VEHICLE_MAKE MK
+ON VM.MAKE_ID = MK.MAKE_ID;
+
+          
+-- 2. INNER JOIN
+-- Display City with State
+          
+
+SELECT C.CITY_NAME,
+       S.STATE_NAME
+FROM MI_CITY C
+INNER JOIN MI_STATE S
+ON C.STATE_ID = S.STATE_ID;
+
+          
+-- 3. INNER JOIN
+-- Display State with Region
+          
+
+SELECT S.STATE_NAME,
+       R.REGION_NAME
+FROM MI_STATE S
+INNER JOIN MI_REGION R
+ON S.REGION_ID = R.REGION_ID;
+
+          
+-- 4. INNER JOIN
+-- Display Person Details with City
+          
+
+SELECT P.USER_ID,
+       P.FIRST_NAME,
+       P.LAST_NAME,
+       C.CITY_NAME
+FROM MI_PERSON P
+INNER JOIN MI_CITY C
+ON P.CITY = C.CITY_ID;
+
+          
+-- 5. INNER JOIN
+-- Display Login Details with Person
+          
+
+SELECT L.LOGIN_ID,
+       P.FIRST_NAME,
+       L.USER_TYPE,
+       L.STATUS
+FROM MI_LOGIN L
+INNER JOIN MI_PERSON P
+ON L.USER_ID = P.USER_ID;
+
+          
+-- 6. INNER JOIN
+-- Display Product with Premium Rate
+          
+
+SELECT PC.PRODUCT_NAME,
+       PR.BASE_PREMIUM,
+       PR.TAX_PERCENT
+FROM MI_PRODUCT_CONFIG PC
+INNER JOIN MI_PREMIUM_RATE PR
+ON PC.PRODUCT_ID = PR.PRODUCT_ID;
+
+          
+-- 7. INNER JOIN
+-- Display Broker Commission
+          
+
+SELECT B.BROKER_NAME,
+       PC.PRODUCT_NAME,
+       BC.COMMISSION_PERCENT
+FROM MI_BROKER B
+INNER JOIN MI_BROKER_COMMISSION BC
+ON B.BROKER_ID = BC.BROKER_ID
+INNER JOIN MI_PRODUCT_CONFIG PC
+ON BC.PRODUCT_ID = PC.PRODUCT_ID;
+
+          
+-- 8. INNER JOIN
+-- Display Quote Details
+          
+
+SELECT Q.QUOTE_ID,
+       P.FIRST_NAME,
+       PC.PRODUCT_NAME,
+       Q.FINAL_PREMIUM
+FROM MI_QUOTE Q
+INNER JOIN MI_PERSON P
+ON Q.USER_ID = P.USER_ID
+INNER JOIN MI_PRODUCT_CONFIG PC
+ON Q.PRODUCT_ID = PC.PRODUCT_ID;
+
+          
+-- 9. INNER JOIN
+-- Display Premium Details
+          
+
+SELECT PD.PREMIUM_ID,
+       Q.QUOTE_ID,
+       P.FIRST_NAME,
+       PD.TOTAL_AMOUNT
+FROM MI_PREMIUM_DETAILS PD
+INNER JOIN MI_QUOTE Q
+ON PD.QUOTE_ID = Q.QUOTE_ID
+INNER JOIN MI_PERSON P
+ON Q.USER_ID = P.USER_ID;
+
+          
+-- 10. MULTI TABLE JOIN
+-- Display Complete Insurance Details
+          
+
+SELECT
+P.USER_ID,
+P.FIRST_NAME,
+P.LAST_NAME,
+PC.PRODUCT_NAME,
+Q.COVER_TYPE,
+Q.PREMIUM,
+Q.TAX,
+Q.FINAL_PREMIUM,
+B.BROKER_NAME
+FROM MI_PERSON P
+INNER JOIN MI_QUOTE Q
+ON P.USER_ID = Q.USER_ID
+INNER JOIN MI_PRODUCT_CONFIG PC
+ON Q.PRODUCT_ID = PC.PRODUCT_ID
+INNER JOIN MI_BROKER_COMMISSION BC
+ON PC.PRODUCT_ID = BC.PRODUCT_ID
+INNER JOIN MI_BROKER B
+ON BC.BROKER_ID = B.BROKER_ID;
+USE MotorInsurance;
+
+          
+-- 1. Find Customer(s) with Maximum Premium
+          
+
+SELECT FIRST_NAME, LAST_NAME
+FROM MI_PERSON
+WHERE USER_ID = (
+    SELECT USER_ID
+    FROM MI_QUOTE
+    WHERE FINAL_PREMIUM = (
+        SELECT MAX(FINAL_PREMIUM)
+        FROM MI_QUOTE
+    )
+);
+
+          
+-- 2. Find Product with Highest Base Premium
+          
+
+SELECT PRODUCT_NAME
+FROM MI_PRODUCT_CONFIG
+WHERE PRODUCT_ID = (
+    SELECT PRODUCT_ID
+    FROM MI_PREMIUM_RATE
+    WHERE BASE_PREMIUM = (
+        SELECT MAX(BASE_PREMIUM)
+        FROM MI_PREMIUM_RATE
+    )
+);
+
+          
+-- 3. Find Broker with Highest Commission
+          
+
+SELECT BROKER_NAME
+FROM MI_BROKER
+WHERE BROKER_ID = (
+    SELECT BROKER_ID
+    FROM MI_BROKER_COMMISSION
+    WHERE COMMISSION_PERCENT = (
+        SELECT MAX(COMMISSION_PERCENT)
+        FROM MI_BROKER_COMMISSION
+    )
+);
+
+          
+-- 4. Display Customers Having Premium
+-- Greater Than Average Premium
+          
+
+SELECT FIRST_NAME, LAST_NAME
+FROM MI_PERSON
+WHERE USER_ID IN (
+    SELECT USER_ID
+    FROM MI_QUOTE
+    WHERE FINAL_PREMIUM >
+    (
+        SELECT AVG(FINAL_PREMIUM)
+        FROM MI_QUOTE
+    )
+);
+
+          
+-- 5. Find Cities Belonging to Tamil Nadu
+          
+
+SELECT CITY_NAME
+FROM MI_CITY
+WHERE STATE_ID = (
+    SELECT STATE_ID
+    FROM MI_STATE
+    WHERE STATE_NAME='Tamil Nadu'
+);
+
+          
+-- 6. Find Models Belonging to Toyota
+          
+
+SELECT MODEL_DESC
+FROM MI_VEHICLE_MODEL
+WHERE MAKE_ID = (
+    SELECT MAKE_ID
+    FROM MI_VEHICLE_MAKE
+    WHERE MAKE_DESC='Toyota'
+);
+
+          
+-- 7. Display Customers Who Have Quotes
+          
+
+SELECT FIRST_NAME,LAST_NAME
+FROM MI_PERSON
+WHERE USER_ID IN
+(
+    SELECT USER_ID
+    FROM MI_QUOTE
+);
+
+          
+-- 8. Display Customers Who Do NOT Have Quotes
+          
+
+SELECT FIRST_NAME,LAST_NAME
+FROM MI_PERSON
+WHERE USER_ID NOT IN
+(
+    SELECT USER_ID
+    FROM MI_QUOTE
+);
+
+          
+-- 9. Find Products Never Used in Quotes
+          
+
+SELECT PRODUCT_NAME
+FROM MI_PRODUCT_CONFIG
+WHERE PRODUCT_ID NOT IN
+(
+    SELECT PRODUCT_ID
+    FROM MI_QUOTE
+);
+
+          
+-- 10. Find Brokers Having More Than One Product
+          
+
+SELECT BROKER_NAME
+FROM MI_BROKER
+WHERE BROKER_ID IN
+(
+    SELECT BROKER_ID
+    FROM MI_BROKER_COMMISSION
+    GROUP BY BROKER_ID
+    HAVING COUNT(PRODUCT_ID) > 1
+);
+USE MotorInsurance;
+
+          
+-- PROCEDURE 1
+-- Add New Customer
+          
+
+DELIMITER $$
+
+CREATE PROCEDURE AddCustomer(
+    IN p_usertype VARCHAR(30),
+    IN p_firstname VARCHAR(50),
+    IN p_lastname VARCHAR(50),
+    IN p_gender VARCHAR(10),
+    IN p_dob DATE,
+    IN p_email VARCHAR(100),
+    IN p_phone VARCHAR(20),
+    IN p_mobile VARCHAR(20),
+    IN p_city INT,
+    IN p_state INT
+)
+BEGIN
+
+INSERT INTO MI_PERSON
+(USER_TYPE,FIRST_NAME,LAST_NAME,GENDER,DOB,
+EMAIL,PHONE,MOBILE,CITY,STATE,
+STATUS,ADDED_BY)
+
+VALUES
+
+(p_usertype,p_firstname,p_lastname,p_gender,
+p_dob,p_email,p_phone,p_mobile,p_city,p_state,
+'ACTIVE','ADMIN');
+
+END$$
+
+DELIMITER ;
+
+-- Execute
+CALL AddCustomer(
+'Customer',
+'Rahul',
+'Sharma',
+'Male',
+'1998-06-15',
+'rahul@gmail.com',
+'0441234567',
+'9876543210',
+1,
+1
+);
+
+
+-- PROCEDURE 2
+-- Update Premium Rate
+
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdatePremium(
+
+IN p_rateid INT,
+IN p_premium DECIMAL(10,2)
+
+)
+
+BEGIN
+
+UPDATE MI_PREMIUM_RATE
+
+SET BASE_PREMIUM=p_premium
+
+WHERE RATE_ID=p_rateid;
+
+END$$
+
+DELIMITER ;
+
+-- Execute
+CALL UpdatePremium(1,12000);
+
+
+-- PROCEDURE 3
+-- Generate Quote
+
+
+DELIMITER $$
+
+CREATE PROCEDURE GenerateQuote(
+
+IN p_userid INT,
+IN p_productid INT,
+IN p_cover VARCHAR(50),
+IN p_premium DECIMAL(10,2),
+IN p_tax DECIMAL(10,2)
+
+)
+
+BEGIN
+
+INSERT INTO MI_QUOTE
+
+(USER_ID,
+PRODUCT_ID,
+COVER_TYPE,
+PREMIUM,
+TAX,
+FINAL_PREMIUM,
+STATUS)
+
+VALUES
+
+(
+p_userid,
+p_productid,
+p_cover,
+p_premium,
+p_tax,
+p_premium+p_tax,
+'APPROVED'
+);
+
+END$$
+
+DELIMITER ;
+
+-- Execute
+
+CALL GenerateQuote(
+1,
+2,
+'Comprehensive',
+10000,
+1800
+);
+USE MotorInsurance;
+
+
+-- FUNCTION 1
+-- Calculate Tax Amount
+
+DELIMITER $$
+
+CREATE FUNCTION CalculateTax(
+    Premium DECIMAL(10,2),
+    TaxPercent DECIMAL(5,2)
+)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE TaxAmount DECIMAL(10,2);
+
+    SET TaxAmount = (Premium * TaxPercent) / 100;
+
+    RETURN TaxAmount;
+END$$
+
+DELIMITER ;
+
+-- Execute Function
+SELECT CalculateTax(10000,18) AS Tax_Amount;
+USE MotorInsurance;
+
+DELIMITER $$
+
+CREATE FUNCTION CalculateFinalPremium(
+    Premium DECIMAL(10,2),
+    Tax DECIMAL(10,2)
+)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE FinalPremium DECIMAL(10,2);
+
+    SET FinalPremium = Premium + Tax;
+
+    RETURN FinalPremium;
+END$$
+INSERT INTO MI_PERSON
+(USER_TYPE,FIRST_NAME,LAST_NAME,GENDER,DOB,
+EMAIL,PHONE,MOBILE,CITY,STATE,
+STATUS,ADDED_BY)
+
+VALUES
+('Customer',
+'Arun',
+'Kumar',
+'Male',
+'1999-05-20',
+'arun@gmail.com',
+'0441234567',
+'9876543210',
+1,
+1,
+'ACTIVE',
+'Admin');
+
+SELECT * FROM MI_PERSON;
+DELIMITER $$
+
+CREATE TRIGGER TRG_BEFORE_INSERT_QUOTE
+BEFORE INSERT ON MI_QUOTE
+FOR EACH ROW
+BEGIN
+    SET NEW.FINAL_PREMIUM = NEW.PREMIUM + NEW.TAX;
+END$$
+
+DELIMITER ;
+INSERT INTO MI_QUOTE
+(USER_ID,
+PRODUCT_ID,
+COVER_TYPE,
+PREMIUM,
+TAX,
+STATUS)
+
+VALUES
+(
+1,
+1,
+'Comprehensive',
+10000,
+1800,
+'APPROVED'
+);
+
+SELECT * FROM MI_QUOTE;
+
+DELIMITER ;
+
+-- Execute Function
+SELECT CalculateFinalPremium(10000,1800) AS Final_Premium;
+SELECT CalculateTax(10000,18);
+SELECT CalculateFinalPremium(10000,1800);
+USE MotorInsurance;
+
+DELIMITER $$
+
+CREATE TRIGGER TRG_BEFORE_INSERT_PERSON
+BEFORE INSERT ON MI_PERSON
+FOR EACH ROW
+BEGIN
+    SET NEW.ADDED_ON = CURRENT_TIMESTAMP;
+END$$
+
+DELIMITER ;
